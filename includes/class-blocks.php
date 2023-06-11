@@ -160,6 +160,52 @@ class Blocks {
 	}
 
 	/**
+	 * Registers the Repost block template.
+	 *
+	 * I.e., a new repost (the custom post type) will start with an (empty) Repost
+	 * block.
+	 */
+	public static function register_block_templates() {
+		$post_type_object = get_post_type_object( 'indieblocks_repost' );
+
+		if ( ! $post_type_object ) {
+			// Post type not active.
+			return;
+		}
+
+		$post_type_object->template = array(
+			array(
+				'indieblocks/repost',
+				array(),
+				array( array( 'core/paragraph' ) ),
+			),
+		);
+	}
+
+	/**
+	 * Registers the Bookmark block template.
+	 *
+	 * I.e., a new bookmark (the custom post type) will start with an (empty) Bookmark
+	 * block.
+	 */
+	public static function register_block_templates() {
+		$post_type_object = get_post_type_object( 'indieblocks_bookmark' );
+
+		if ( ! $post_type_object ) {
+			// Post type not active.
+			return;
+		}
+
+		$post_type_object->template = array(
+			array(
+				'indieblocks/bookmark',
+				array(),
+				array( array( 'core/paragraph' ) ),
+			),
+		);
+	}
+
+	/**
 	 * Registers (block-related) REST API endpoints.
 	 */
 	public static function register_api_endpoints() {

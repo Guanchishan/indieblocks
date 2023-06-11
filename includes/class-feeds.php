@@ -64,7 +64,7 @@ class Feeds {
 	public static function include_in_main_feed( $query_vars ) {
 		$options = get_options();
 
-		if ( empty( $options['notes_in_feed'] ) && empty( $options['likes_in_feed'] ) ) {
+		if ( empty( $options['notes_in_feed'] ) && empty( $options['likes_in_feed'] ) && empty( $options['reposts_in_feed'] ) && empty( $options['bookmarks_in_feed'] ) ) {
 			// Do nothing.
 			return $query_vars;
 		}
@@ -79,6 +79,14 @@ class Feeds {
 
 			if ( ! empty( $options['likes_in_feed'] ) ) {
 				$query_vars['post_type'][] = 'indieblocks_like';
+			}
+
+			if ( ! empty( $options['reposts_in_feed'] ) ) {
+				$query_vars['post_type'][] = 'indieblocks_repost';
+			}
+
+			if ( ! empty( $options['bookmarks_in_feed'] ) ) {
+				$query_vars['post_type'][] = 'indieblocks_bookmark';
 			}
 		}
 

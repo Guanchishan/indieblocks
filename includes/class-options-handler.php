@@ -580,6 +580,18 @@ class Options_Handler {
 			if ( ! empty( $post_type->rewrite['slug'] ) ) {
 				$example_front = $post_type->rewrite['slug']; // If notes are disabled but likes are enabled, use the likes slug.
 			}
+		} elseif ( ! empty( $this->options['enable_reposts'] ) ) {
+			$post_type = get_post_type_object( 'indieblocks_repost' );
+
+			if ( ! empty( $post_type->rewrite['slug'] ) ) {
+				$example_front = $post_type->rewrite['slug']; 
+			}
+		} elseif ( ! empty( $this->options['enable_bookmarks'] ) ) {
+			$post_type = get_post_type_object( 'indieblocks_bookmark' );
+
+			if ( ! empty( $post_type->rewrite['slug'] ) ) {
+				$example_front = $post_type->rewrite['slug']; 
+			}
 		}
 
 		if ( 0 === strpos( $format, '/%front%' ) ) {

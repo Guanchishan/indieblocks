@@ -181,6 +181,18 @@ class Micropub_Compat {
 			}
 		}
 
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_reposts'] ) ) {
+			if ( ! empty( $input['properties']['repost-of'][0] ) ) {
+				$post_type = 'indieblocks_repost';
+			}
+		}
+
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_bookmarks'] ) ) {
+			if ( ! empty( $input['properties']['bookmark-of'][0] ) ) {
+				$post_type = 'indieblocks_bookmark';
+			}
+		}
+
 		return $post_type;
 	}
 

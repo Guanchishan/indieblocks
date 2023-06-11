@@ -479,7 +479,7 @@ class Theme_Mf2 {
 		// Note and Like titles, by default, do not get the `p-name` class.
 		$options = get_options();
 
-		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note', 'indieblocks_repost', 'indieblocks_bookmark' ), true ) ) {
 			// Not a like or note.
 			$classes[] = 'p-name';
 		} elseif ( ! empty( $options['unhide_like_and_bookmark_titles'] ) && '' !== get_post_meta( $post_ID, '_indieblocks_linked_url', true ) ) {
@@ -496,7 +496,7 @@ class Theme_Mf2 {
 
 		$permalink = get_the_permalink( $post_ID );
 
-		if ( ! empty( $options['like_and_bookmark_titles'] ) && in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+		if ( ! empty( $options['like_and_bookmark_titles'] ) && in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note', 'indieblocks_repost', 'indieblocks_bookmark' ), true ) ) {
 			$linked_url = get_post_meta( $post_ID, '_indieblocks_linked_url', true );
 			$permalink  = ! empty( $linked_url )
 				? $linked_url
@@ -507,6 +507,12 @@ class Theme_Mf2 {
 			if ( get_post_type() === 'indieblocks_like' && '' !== $linked_url ) {
 				// @todo: Expand to "implicit" likes? And how about bookmarks and so on?
 				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-like-of">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
+			} elseif (get_post_type() === 'indieblocks_repost' && '' !== $linked_url) {
+				// For 'indieblocks_repost' type, use class "u-repost-of"
+				$title = sprintf('<a href="%1$s" target="%2$s" rel="%3$s" class="u-repost-of">%4$s</a>', esc_url($permalink), esc_attr($attributes['linkTarget']), esc_attr($attributes['rel']), $title);
+			} elseif (get_post_type() === 'indieblocks_bookmark' && '' !== $linked_url) {
+				// For 'indieblocks_bookmark' type, use class "u-bookmark-of"
+				$title = sprintf('<a href="%1$s" target="%2$s" rel="%3$s" class="u-bookmark-of">%4$s</a>', esc_url($permalink), esc_attr($attributes['linkTarget']), esc_attr($attributes['rel']), $title);
 			} else {
 				$title = sprintf( '<a href="%1$s" target="%2$s" rel="%3$s" class="u-url">%4$s</a>', esc_url( $permalink ), esc_attr( $attributes['linkTarget'] ), esc_attr( $attributes['rel'] ), $title );
 			}

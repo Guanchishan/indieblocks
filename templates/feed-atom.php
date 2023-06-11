@@ -75,8 +75,8 @@ do_action( 'rss_tag_pre', 'atom' );
 		<?php
 		$options = \IndieBlocks\get_options();
 
-		if ( ! in_array( get_post_type(), array( 'indieblocks_like', 'indieblocks_note' ), true ) ) :
-			// Show titles for post types _other than_ notes and likes.
+		if ( ! in_array( get_post_type(), array( 'indieblocks_bookmark', 'indieblocks_repost', 'indieblocks_like', 'indieblocks_note' ), true ) ) :
+			// Show titles for post types _other than_ notes, likes, reposts and bookmarks.
 			?>
 			<title type="<?php html_type_rss(); ?>"><![CDATA[<?php the_title_rss(); ?>]]></title>
 			<?php

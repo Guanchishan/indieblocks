@@ -56,6 +56,14 @@ class Post_Types {
 			if ( ! empty( $options['enable_likes'] ) ) {
 				add_filter( 'save_post_indieblocks_like', array( __CLASS__, 'set_post_meta' ), 10, 2 );
 			}
+
+			if ( ! empty( $options['enable_reposts'] ) ) {
+				add_filter( 'save_post_indieblocks_repost', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+			}
+
+			if ( ! empty( $options['enable_bookmarks'] ) ) {
+				add_filter( 'save_post_indieblocks_bookmark', array( __CLASS__, 'set_post_meta' ), 10, 2 );
+			}
 		}
 
 		if ( ! empty( $options['random_slugs'] ) ) {
@@ -147,6 +155,78 @@ class Post_Types {
 
 			register_post_type( 'indieblocks_like', $args );
 		}
+
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_reposts'] ) ) {
+			// Reposts.
+			$args = array(
+				'labels'            => array(
+					'name'               => __( 'Reposts', 'indieblocks' ),
+					'singular_name'      => __( 'Repost', 'indieblocks' ),
+					'add_new'            => __( 'New Repost', 'indieblocks' ),
+					'add_new_item'       => __( 'Add New Repost', 'indieblocks' ),
+					'edit_item'          => __( 'Edit Repost', 'indieblocks' ),
+					'view_item'          => __( 'View Repost', 'indieblocks' ),
+					'view_items'         => __( 'View Reposts', 'indieblocks' ),
+					'search_items'       => __( 'Search Reposts', 'indieblocks' ),
+					'not_found'          => __( 'No reposts found.', 'indieblocks' ),
+					'not_found_in_trash' => __( 'No reposts found in trash.', 'indieblocks' ),
+				),
+				'public'            => true,
+				'has_archive'       => true,
+				'show_in_nav_menus' => true,
+				'rewrite'           => array(
+					'slug'       => __( 'reposts', 'indieblocks' ),
+					'with_front' => ! empty( $options['permalink_format'] ) && 0 === strpos( $options['permalink_format'], '/%front%' ) ? true : false,
+				),
+				'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'trackbacks', 'comments', 'wpcom-markdown' ),
+				'menu_icon'         => 'dashicons-heart',
+				'capability_type'   => 'post',
+				'map_meta_cap'      => true,
+				'menu_position'     => 5,
+			);
+
+			if ( ! empty( $options['enable_blocks'] ) ) {
+				$args['show_in_rest'] = true;
+			}
+
+			register_post_type( 'indieblocks_repost', $args );
+		}
+
+		if ( ! empty( $options['post_types'] ) || ! empty( $options['enable_bookmarks'] ) ) {
+			// Bookmarks.
+			$args = array(
+				'labels'            => array(
+					'name'               => __( 'Bookmarks', 'indieblocks' ),
+					'singular_name'      => __( 'Bookmark', 'indieblocks' ),
+					'add_new'            => __( 'New Bookmark', 'indieblocks' ),
+					'add_new_item'       => __( 'Add New Bookmark', 'indieblocks' ),
+					'edit_item'          => __( 'Edit Bookmark', 'indieblocks' ),
+					'view_item'          => __( 'View Bookmark', 'indieblocks' ),
+					'view_items'         => __( 'View Bookmarks', 'indieblocks' ),
+					'search_items'       => __( 'Search Bookmarks', 'indieblocks' ),
+					'not_found'          => __( 'No bookmarks found.', 'indieblocks' ),
+					'not_found_in_trash' => __( 'No bookmarks found in trash.', 'indieblocks' ),
+				),
+				'public'            => true,
+				'has_archive'       => true,
+				'show_in_nav_menus' => true,
+				'rewrite'           => array(
+					'slug'       => __( 'bookmarks', 'indieblocks' ),
+					'with_front' => ! empty( $options['permalink_format'] ) && 0 === strpos( $options['permalink_format'], '/%front%' ) ? true : false,
+				),
+				'supports'          => array( 'author', 'title', 'editor', 'thumbnail', 'custom-fields', 'trackbacks', 'comments', 'wpcom-markdown' ),
+				'menu_icon'         => 'dashicons-heart',
+				'capability_type'   => 'post',
+				'map_meta_cap'      => true,
+				'menu_position'     => 5,
+			);
+
+			if ( ! empty( $options['enable_blocks'] ) ) {
+				$args['show_in_rest'] = true;
+			}
+
+			register_post_type( 'indieblocks_bookmark', $args );
+		}
 	}
 
 	/**
@@ -162,13 +242,13 @@ class Post_Types {
 			return $data;
 		}
 
-		if ( ! in_array( $data['post_type'], array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+		if ( ! in_array( $data['post_type'], array( 'indieblocks_bookmark', 'indieblocks_repost', 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			return $data;
 		}
 
 		global $wpdb;
 
-		// Generate a random slug for short-form content, i.e., notes and likes.
+		// Generate a random slug for short-form content, i.e., notes, likes, reposts and bookmarks.
 		do {
 			// Generate random slug.
 			$slug = bin2hex( openssl_random_pseudo_bytes( 5 ) );
@@ -193,7 +273,7 @@ class Post_Types {
 	 * @return array          Updated (slashed) data.
 	 */
 	public static function set_title( $data, $postarr ) {
-		if ( ! in_array( $data['post_type'], array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+		if ( ! in_array( $data['post_type'], array( 'indieblocks_bookmark', 'indieblocks_repost', 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			return $data;
 		}
 
@@ -285,7 +365,7 @@ class Post_Types {
 	 * @param  WP_Post $post    Post object.
 	 */
 	public static function set_post_meta( $post_id, $post ) {
-		if ( ! in_array( $post->post_type, array( 'indieblocks_like', 'indieblocks_note' ), true ) ) {
+		if ( ! in_array( $post->post_type, array( 'indieblocks_bookmark', 'indieblocks_repost', 'indieblocks_like', 'indieblocks_note' ), true ) ) {
 			return;
 		}
 
@@ -396,6 +476,14 @@ class Post_Types {
 			$post_types[] = 'indieblocks_like';
 		}
 
+		if ( ! empty( $options['reposts_in_home'] ) ) {
+			$post_types[] = 'indieblocks_repost';
+		}
+
+		if ( ! empty( $options['bookmarks_in_home'] ) ) {
+			$post_types[] = 'indieblocks_bookmark';
+		}
+
 		$query->set( 'post_type', array_unique( $post_types ) );
 
 		return $query;
@@ -416,6 +504,14 @@ class Post_Types {
 
 			if ( ! empty( $options['enable_likes'] ) ) {
 				$post_types[] = 'indieblocks_like';
+			}
+
+			if ( ! empty( $options['enable_reposts'] ) ) {
+				$post_types[] = 'indieblocks_repost';
+			}
+
+			if ( ! empty( $options['enable_bookmarks'] ) ) {
+				$post_types[] = 'indieblocks_bookmark';
 			}
 
 			foreach ( $post_types as $post_type ) {
@@ -461,6 +557,14 @@ class Post_Types {
 
 		if ( ! empty( $options['enable_likes'] ) ) {
 			$post_types[] = 'indieblocks_like';
+		}
+
+		if ( ! empty( $options['enable_reposts'] ) ) {
+			$post_types[] = 'indieblocks_repost';
+		}
+
+		if ( ! empty( $options['enable_bookmarks'] ) ) {
+			$post_types[] = 'indieblocks_bookmark';
 		}
 
 		foreach ( $post_types as $post_type ) {
@@ -529,7 +633,7 @@ class Post_Types {
 	 * @return string            Filtered permalink.
 	 */
 	public static function post_type_link( $permalink, $post ) {
-		if ( ! in_array( get_post_type( $post ), array( 'indieblocks_note', 'indieblocks_like' ), true ) ) {
+		if ( ! in_array( get_post_type( $post ), array( 'indieblocks_note', 'indieblocks_like', 'indieblocks_repost', 'indieblocks_bookmark' ), true ) ) {
 			return $permalink;
 		}
 
@@ -563,7 +667,7 @@ class Post_Types {
 			return;
 		}
 
-		if ( ! is_post_type_archive( array( 'indieblocks_note', 'indieblocks_like' ) ) ) {
+		if ( ! is_post_type_archive( array( 'indieblocks_note', 'indieblocks_like', 'indieblocks_repost', 'indieblocks_bookmark' ) ) ) {
 			return;
 		}
 
@@ -592,7 +696,7 @@ class Post_Types {
 	public static function prevent_slug_clashes( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
 		// Note that although `$slug` is already guaranteed unique, it can still
 		// clash with date archives.
-		if ( ! in_array( $post_type, array( 'indieblocks_note', 'indieblocks_like' ), true ) ) {
+		if ( ! in_array( $post_type, array( 'indieblocks_note', 'indieblocks_like', 'indieblocks_repost', 'indieblocks_bookmark' ), true ) ) {
 			return $slug;
 		}
 
